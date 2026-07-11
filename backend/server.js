@@ -11,6 +11,8 @@ import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 
+import { seedDatabaseCloud } from './utils/seed.js';
+
 dotenv.config();
 
 // Connect to MongoDB
@@ -38,6 +40,16 @@ app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 // Health Check API
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'DIGITECH SYSTEMS server is running' });
+});
+
+// Cloud Seeder route (Trigger online via browser)
+app.get('/api/seed-database', async (req, res, next) => {
+  try {
+    const data = await seedDatabaseCloud();
+    res.json({ success: true, message: 'MongoDB Atlas seeded successfully!', data });
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Fallback Middlewares

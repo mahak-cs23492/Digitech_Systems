@@ -264,36 +264,31 @@ const products = [
   }
 ];
 
-const seedData = async () => {
-  try {
-    await connectDB();
+export const seedDatabaseCloud = async () => {
+  // Clear collection data
+  await User.deleteMany();
+  await Product.deleteMany();
+  await Order.deleteMany();
 
-    // Clear collection data
-    await User.deleteMany();
-    await Product.deleteMany();
-    await Order.deleteMany();
+  console.log('Old collections cleared.');
 
-    console.log('Old collections cleared.');
-
-    // Seed users (using save() individually to trigger pre-save password hashing hooks)
-    const createdUsers = [];
-    for (const u of users) {
-      const user = new User(u);
-      await user.save();
-      createdUsers.push(user);
-    }
-    console.log(`Seeded ${createdUsers.length} users successfully.`);
-
-    // Seed products
-    const createdProducts = await Product.insertMany(products);
-    console.log(`Seeded ${createdProducts.length} products successfully.`);
-
-    console.log('Database Seeding Completed Successfully!');
-    process.exit();
-  } catch (error) {
-    console.error(`Database seeding failed: ${error.message}`);
-    process.exit(1);
+  // Seed users (using save() individually to trigger pre-save password hashing hooks)
+  const createdUsers = [];
+  for (const u of users) {
+    const user = new User(u);
+    await user.save();
+    createdUsers.push(user);
   }
+  console.log(`Seeded ${createdUsers.length} users successfully.`);
+
+  // Seed products
+  const createdProducts = await Product.insertMany(products);
+  console.log(`Seeded ${createdProducts.length} products successfully.`);
+
+  console.log('Database Seeding Completed Successfully!');
+  return {
+    usersCount: createdUsers.length,
+    productsCount: createdProducts.length
+  };
 };
 
-seedData();
