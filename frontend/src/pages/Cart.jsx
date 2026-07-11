@@ -1,10 +1,9 @@
 import React, { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { FiTrash2, FiMinus, FiPlus, FiArrowRight, FiShoppingBag } from 'react-icons/fi';
 import { CartContext } from '../context/CartContext.jsx';
 
 const Cart = () => {
-  const navigate = useNavigate();
   const {
     cartItems,
     removeFromCart,
@@ -20,10 +19,6 @@ const Cart = () => {
     if (nextQty >= 1 && nextQty <= stock) {
       updateCartQty(id, nextQty);
     }
-  };
-
-  const handleCheckout = () => {
-    navigate('/login?redirect=checkout');
   };
 
   return (
@@ -160,19 +155,12 @@ const Cart = () => {
               </div>
             </div>
 
-            <button
-              onClick={handleCheckout}
-              className="w-full bg-accent hover:bg-secondary text-white font-bold py-3.5 rounded-xl shadow-md transition duration-300 flex items-center justify-center space-x-2"
+            <Link
+              to="/products"
+              className="w-full bg-accent hover:bg-secondary text-white font-bold py-3.5 rounded-xl shadow-md transition duration-300 flex items-center justify-center space-x-2 text-center text-sm"
             >
-              <span>Proceed to Checkout</span>
-              <FiArrowRight />
-            </button>
-            
-            <div className="text-center">
-              <Link to="/products" className="text-xs text-slate-500 hover:text-accent hover:underline">
-                Continue Shopping
-              </Link>
-            </div>
+              <span>Continue Shopping</span>
+            </Link>
           </div>
 
         </div>

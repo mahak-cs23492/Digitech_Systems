@@ -5,9 +5,7 @@ import API from '../utils/api.js';
 import Loader from '../components/Loader.jsx';
 import { toast } from 'react-toastify';
 import { 
-  FiTrendingUp, 
   FiBox, 
-  FiShoppingBag, 
   FiUsers, 
   FiPlus, 
   FiEdit, 
@@ -16,7 +14,6 @@ import {
   FiEye, 
   FiUploadCloud, 
   FiCheckCircle, 
-  FiXCircle, 
   FiList 
 } from 'react-icons/fi';
 
@@ -24,12 +21,10 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const { userInfo } = useContext(AuthContext);
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get('tab') || 'overview';
+  const activeTab = searchParams.get('tab') || 'products';
 
   // State collections
-  const [stats, setStats] = useState(null);
   const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
   
   // Loading indicators
@@ -79,16 +74,10 @@ const AdminDashboard = () => {
     const loadTabData = async () => {
       setLoading(true);
       try {
-        if (activeTab === 'overview') {
-          const { data } = await API.get('/api/users/stats');
-          setStats(data);
-        } else if (activeTab === 'products') {
+        if (activeTab === 'products') {
           // Send query parameters stating admin view (returns hidden items too)
           const { data } = await API.get('/api/products?isAdminView=true');
           setProducts(data);
-        } else if (activeTab === 'orders') {
-          const { data } = await API.get('/api/orders');
-          setOrders(data);
         } else if (activeTab === 'users') {
           const { data } = await API.get('/api/users');
           setUsers(data);
@@ -281,9 +270,7 @@ const AdminDashboard = () => {
   };
 
   const tabs = [
-    { id: 'overview', label: 'Overview Metrics', icon: <FiTrendingUp /> },
     { id: 'products', label: 'Products Inventory', icon: <FiBox /> },
-    { id: 'orders', label: 'Orders Hub', icon: <FiShoppingBag /> },
     { id: 'users', label: 'System Users', icon: <FiUsers /> }
   ];
 
@@ -326,81 +313,7 @@ const AdminDashboard = () => {
       ) : (
         <>
           
-          {/* TAB 1: OVERVIEW METRICS */}
-          {activeTab === 'overview' && stats && (
-            <div className="space-y-8">
-              
-              {/* Metrics Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-card flex items-center space-x-5">
-                  <div className="bg-green-500/10 text-green-600 p-4 rounded-2xl">
-                    <FiTrendingUp className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 font-semibold block uppercase tracking-wider">Total Sales</span>
-                    <h3 className="text-2xl font-extrabold text-slate-900 mt-1">₹{stats.metrics.totalSales}</h3>
-                  </div>
-                </div>
-                <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-card flex items-center space-x-5">
-                  <div className="bg-accent/10 text-accent p-4 rounded-2xl">
-                    <FiShoppingBag className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 font-semibold block uppercase tracking-wider">Total Orders</span>
-                    <h3 className="text-2xl font-extrabold text-slate-900 mt-1">{stats.metrics.ordersCount}</h3>
-                  </div>
-                </div>
-                <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-card flex items-center space-x-5">
-                  <div className="bg-highlight/10 text-highlight p-4 rounded-2xl">
-                    <FiBox className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 font-semibold block uppercase tracking-wider">Products Count</span>
-                    <h3 className="text-2xl font-extrabold text-slate-900 mt-1">{stats.metrics.productsCount}</h3>
-                  </div>
-                </div>
-                <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-card flex items-center space-x-5">
-                  <div className="bg-purple-600/10 text-purple-600 p-4 rounded-2xl">
-                    <FiUsers className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <span className="text-xs text-slate-400 font-semibold block uppercase tracking-wider">User Registrations</span>
-                    <h3 className="text-2xl font-extrabold text-slate-900 mt-1">{stats.metrics.usersCount}</h3>
-                  </div>
-                </div>
-              </div>
-
-              {/* Monthly sales report graph simulator */}
-              <div className="bg-white border border-slate-100 rounded-3xl p-6 md:p-8 shadow-card space-y-6">
-                <h4 className="font-extrabold text-slate-900 text-lg border-b border-slate-50 pb-3">Monthly Sales Reporting (INR)</h4>
-                
-                <div className="h-60 flex items-end justify-between gap-2.5 pt-8 px-4 border-b border-slate-150">
-                  {stats.monthlySales.map((item) => {
-                    const maxVal = Math.max(...stats.monthlySales.map((s) => s.sales), 100);
-                    const barHeight = (item.sales / maxVal) * 100;
-                    return (
-                      <div key={item.month} className="flex-1 flex flex-col items-center group relative h-full justify-end">
-                        
-                        {/* Hover Tooltip tooltip */}
-                        <span className="absolute bottom-full mb-2 bg-slate-950 text-white text-[10px] font-bold py-1 px-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition shadow pointer-events-none whitespace-nowrap">
-                          Sales: ₹{item.sales} ({item.orders} orders)
-                        </span>
-
-                        {/* Bar */}
-                        <div 
-                          className="bg-accent group-hover:bg-secondary w-full rounded-t-lg transition-all duration-500 ease-out min-h-[4px]"
-                          style={{ height: `${barHeight}%` }}
-                        ></div>
-                        
-                        <span className="text-[10px] font-semibold text-slate-400 mt-3 block">{item.month}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-            </div>
-          )}
+          {/* Metrics overview tab removed */}
 
           {/* TAB 2: PRODUCTS INVENTORY */}
           {activeTab === 'products' && (
@@ -499,75 +412,7 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {/* TAB 3: ORDERS HUB */}
-          {activeTab === 'orders' && (
-            <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-card space-y-6">
-              <h3 className="text-lg font-extrabold text-slate-900 border-b border-slate-50 pb-3">Review Customer Orders</h3>
-              
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-100 text-left text-slate-455 uppercase font-bold text-xs">
-                      <th className="py-3 px-4">Order ID</th>
-                      <th className="py-3 px-4">Customer</th>
-                      <th className="py-3 px-4">Date</th>
-                      <th className="py-3 px-4">Total</th>
-                      <th className="py-3 px-4">Paid Status</th>
-                      <th className="py-3 px-4">Shipping Status</th>
-                      <th className="py-3 px-4 text-right">Details</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {orders.map((ord) => (
-                      <tr key={ord._id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50">
-                        <td className="py-4 px-4 font-mono text-xs font-bold text-slate-700">
-                          #{ord._id.substring(0, 10)}...
-                        </td>
-                        <td className="py-4 px-4 font-semibold text-slate-800">
-                          {ord.user?.name || 'Deleted Account'}
-                        </td>
-                        <td className="py-4 px-4 text-slate-505 text-slate-500">
-                          {new Date(ord.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="py-4 px-4 font-bold text-slate-900">₹{ord.totalPrice}</td>
-                        <td className="py-4 px-4">
-                          {ord.isPaid ? (
-                            <span className="bg-green-50 text-green-700 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center w-max">
-                              <FiCheckCircle className="mr-1" /> Paid
-                            </span>
-                          ) : (
-                            <span className="bg-red-50 text-red-700 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center w-max">
-                              <FiXCircle className="mr-1 animate-pulse" /> Pending
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-4 px-4">
-                          {ord.isDelivered ? (
-                            <span className="bg-green-50 text-green-700 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center w-max">
-                              <FiCheckCircle className="mr-1" /> Shipped
-                            </span>
-                          ) : (
-                            <span className="bg-amber-50 text-amber-700 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center w-max">
-                              <FiXCircle className="mr-1" /> Pending
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-4 px-4 text-right">
-                          <button
-                            onClick={() => navigate(`/order/${ord._id}`)}
-                            className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3.5 py-1.5 rounded-xl transition"
-                          >
-                            Edit / View
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-            </div>
-          )}
+          {/* Orders Hub tab removed */}
 
           {/* TAB 4: SYSTEM USERS */}
           {activeTab === 'users' && (

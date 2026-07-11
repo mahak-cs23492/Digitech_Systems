@@ -19,8 +19,6 @@ import Home from './pages/Home.jsx';
 import Products from './pages/Products.jsx';
 import ProductDetails from './pages/ProductDetails.jsx';
 import Cart from './pages/Cart.jsx';
-import Checkout from './pages/Checkout.jsx';
-import OrderDetails from './pages/OrderDetails.jsx';
 import Profile from './pages/Profile.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -53,8 +51,6 @@ const App = () => {
 
                 {/* Customer Authenticated Routes */}
                 <Route element={<PrivateRoute />}>
-                  <Route path="/checkout" element={<Checkout />} />
-                  <Route path="/order/:id" element={<OrderDetails />} />
                   <Route path="/profile" element={<Profile />} />
                 </Route>
 

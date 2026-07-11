@@ -20,9 +20,9 @@ const About = () => {
         
         <div className="relative max-w-4xl mx-auto px-4 z-10 space-y-4">
           <span className="text-accent font-extrabold text-xs tracking-widest uppercase">Our Mission</span>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">About DIGITECH SYSTEMS</h1>
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">About DigiTech Systems</h1>
           <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
-            Your trusted partner in computing hardware, commercial printing systems, visual monitors, and premium office gear since 2011.
+            Your complete laptop solution provider in Aligarh, specializing in premium laptops, setups, and retail services.
           </p>
         </div>
       </div>
@@ -30,12 +30,12 @@ const About = () => {
       {/* Main Core Values */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div className="space-y-6">
-          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Your Trusted Technology Partner</h2>
-          <p className="text-slate-600 text-sm leading-relaxed">
-            At DIGITECH SYSTEMS, we understand that technology is the engine of modern workflows. Whether you represent a corporate office building its infrastructure, a creative editing studio configuring color-accurate displays, or a home office looking for a heavy-duty printer, we have the inventories and expertise to guide you.
+          <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Your Complete Laptop Solution</h2>
+          <p className="text-slate-655 text-sm leading-relaxed text-slate-600">
+            At DigiTech Systems, we understand that technology is the engine of modern workflows. Whether you need a premium gaming laptop, a corporate workhorse, or specialized retail options in Aligarh, we have the inventory and expertise to guide you.
           </p>
-          <p className="text-slate-655 text-sm leading-relaxed">
-            We are official authorized distributors for major manufacturers including HP, Dell, Lenovo, Canon, LG, Logitech, and Corsair. Every single item shipped from our warehouse is backed by its official manufacturer warranty, guaranteeing original performance and premium lifecycle.
+          <p className="text-slate-655 text-sm leading-relaxed text-slate-600 mt-2">
+            We are official authorized distributors for major manufacturers including HP, Dell, Lenovo, and premium accessories brands. Every single item is backed by its official manufacturer warranty, guaranteeing original performance and premium lifecycle.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
@@ -75,7 +75,7 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="text-center max-w-xl mx-auto mb-12">
-            <h3 className="text-2xl font-extrabold text-slate-900">Why DIGITECH SYSTEMS?</h3>
+            <h3 className="text-2xl font-extrabold text-slate-900">Why DigiTech Systems?</h3>
             <p className="text-slate-500 text-xs mt-1">Our philosophy centers around providing elite customer satisfaction and genuine configurations.</p>
           </div>
 

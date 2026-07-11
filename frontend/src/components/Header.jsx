@@ -52,10 +52,10 @@ const Header = () => {
             </div>
             <div className="flex flex-col">
               <span className="font-extrabold text-xl tracking-tight leading-none text-white hover:text-accent transition duration-300">
-                DIGITECH
+                DigiTech
               </span>
-              <span className="text-[10px] text-slate-400 tracking-widest font-medium">
-                SYSTEMS
+              <span className="text-[10px] text-slate-400 tracking-widest font-semibold uppercase">
+                Systems
               </span>
             </div>
           </Link>
@@ -112,7 +112,7 @@ const Header = () => {
           <form onSubmit={handleSearch} className="hidden md:flex items-center relative max-w-md w-full mx-8">
             <input
               type="text"
-              placeholder="Search laptops, printers, monitors..."
+              placeholder="Search laptops, specifications, hardware..."
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               className="w-full bg-slate-800 text-white rounded-full px-5 py-2.5 pl-12 text-sm border border-slate-750 focus:outline-none focus:border-accent focus:bg-slate-900 transition-all"

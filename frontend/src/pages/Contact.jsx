@@ -20,7 +20,7 @@ const Contact = () => {
     // Simulating API latency
     setTimeout(() => {
       setLoading(false);
-      toast.success('Your message has been sent successfully. A DIGITECH consultant will contact you shortly.');
+      toast.success('Your message has been sent successfully. A DigiTech Systems consultant will contact you shortly.');
       setName('');
       setEmail('');
       setSubject('');
@@ -33,21 +33,21 @@ const Contact = () => {
       icon: <FiPhone />,
       title: 'Telephone Support',
       desc: 'Connect directly with sales team or technicians.',
-      value: '+1 (555) 234-5678',
+      value: '+91 9927700201',
       actionText: 'Call Now'
     },
     {
       icon: <FiMail />,
       title: 'Email Correspondence',
-      desc: 'Send us business quotes, RFPs, or inquiries.',
-      value: 'sales@digitechsystems.com',
+      desc: 'Send us business quotes or inquiries.',
+      value: 'ds873@rediffmail.com',
       actionText: 'Send Email'
     },
     {
       icon: <FiMapPin />,
       title: 'Retail Shop Address',
       desc: 'Visit our flagship computer hardware hub.',
-      value: '123 Technology Way, Suite 100',
+      value: 'Shop No. 1, Marris Tower, Marris Road, Aligarh',
       actionText: 'Get Directions'
     }
   ];
@@ -62,9 +62,9 @@ const Contact = () => {
         
         <div className="relative max-w-4xl mx-auto px-4 z-10 space-y-4">
           <span className="text-accent font-extrabold text-xs tracking-widest uppercase">Support Center</span>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Contact DIGITECH SYSTEMS</h1>
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Contact DigiTech Systems</h1>
           <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-xl mx-auto">
-            Have questions about spec configurations, custom quotes, or warranty claims? We are here to help.
+            Have questions about laptop specifications, custom configurations, or services? We are here to help.
           </p>
         </div>
       </div>
@@ -138,7 +138,7 @@ const Contact = () => {
               <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Message Content</label>
               <textarea
                 rows="5"
-                placeholder="How can DIGITECH SYSTEMS help you today? Detail specs or request quotes..."
+                placeholder="How can DigiTech Systems help you today? Detail specs or request services..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent"
@@ -167,22 +167,10 @@ const Contact = () => {
               <span>Business Operations Hours</span>
             </h3>
             
-            <div className="grid grid-cols-2 gap-4 text-sm text-slate-650 pt-2">
+            <div className="grid grid-cols-1 gap-4 text-sm text-slate-650 pt-2">
               <div>
-                <p className="font-bold text-slate-800">Monday - Friday</p>
-                <p className="text-xs text-slate-400 mt-1">9:00 AM - 6:00 PM EST</p>
-              </div>
-              <div>
-                <p className="font-bold text-slate-800">Saturday</p>
-                <p className="text-xs text-slate-400 mt-1">10:00 AM - 4:00 PM EST</p>
-              </div>
-              <div>
-                <p className="font-bold text-slate-800">Sunday</p>
-                <p className="text-xs text-slate-400 mt-1 text-red-500">Shop Closed</p>
-              </div>
-              <div>
-                <p className="font-bold text-slate-800">Support Desk</p>
-                <p className="text-xs text-accent mt-1 font-bold">24/7 Ticketing System</p>
+                <p className="font-bold text-slate-800">Monday - Sunday (Open all 7 days)</p>
+                <p className="text-xs text-slate-400 mt-1">11:00 AM - 8:30 PM</p>
               </div>
             </div>
           </div>
@@ -202,13 +190,13 @@ const Contact = () => {
                 <FiMapPin className="w-5 h-5" />
               </div>
               <span className="bg-slate-900 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow mt-1 whitespace-nowrap">
-                DIGITECH SYSTEMS HQ
+                DigiTech Systems
               </span>
             </div>
 
             <div className="bg-white/95 backdrop-blur-md border border-slate-100 p-4 rounded-2xl relative z-10 shadow-lg text-xs max-w-sm m-4 self-start">
-              <p className="font-bold text-slate-900 mb-1">DIGITECH Flagship Store</p>
-              <p className="text-slate-500 mb-2 leading-relaxed">Central Plaza Shopping Strip, Tech Avenue 101</p>
+              <p className="font-bold text-slate-900 mb-1">DigiTech Store</p>
+              <p className="text-slate-500 mb-2 leading-relaxed">Shop No. 1, Marris Tower, Marris Road, In Front of Citi Centre Mall, Aligarh</p>
               <a href="#" className="text-accent hover:underline font-bold">Open in Maps</a>
             </div>
           </div>

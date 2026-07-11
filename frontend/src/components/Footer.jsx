@@ -18,7 +18,7 @@ const Footer = () => {
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (email.trim()) {
-      toast.success('Thank you for subscribing to DIGITECH SYSTEMS newsletter!');
+      toast.success('Thank you for subscribing to DigiTech Systems newsletter!');
       setEmail('');
     } else {
       toast.error('Please enter a valid email address');
@@ -45,7 +45,7 @@ const Footer = () => {
             </div>
           </div>
           <p className="text-slate-400 text-sm leading-relaxed mb-6">
-            DIGITECH SYSTEMS is your trusted technology partner, offering premium computers, heavy-duty printers, crystal-clear monitors, and high-performance accessories.
+            DigiTech Systems is your complete laptop solution in Aligarh, offering premium laptops, troubleshooting, and shopping & retail support.
           </p>
           <div className="flex space-x-4">
             <a href="https://facebook.com" target="_blank" rel="noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-accent hover:text-white transition duration-300">
@@ -110,19 +110,19 @@ const Footer = () => {
           <ul className="space-y-3.5 text-sm text-slate-400 mb-6">
             <li className="flex items-start">
               <FiMapPin className="text-accent w-5 h-5 mr-3 mt-0.5 flex-shrink-0" />
-              <span>123 Technology Way, Electronic City, Suite 100</span>
+              <span>Shop No. 1, Marris Tower, Marris Road, In Front of Citi Centre Mall, Aligarh</span>
             </li>
             <li className="flex items-center">
               <FiPhone className="text-accent w-5 h-5 mr-3 flex-shrink-0" />
-              <span>+1 (555) 234-5678</span>
+              <span>+91 9927700201</span>
             </li>
             <li className="flex items-center">
               <FiMail className="text-accent w-5 h-5 mr-3 flex-shrink-0" />
-              <span>sales@digitechsystems.com</span>
+              <span>ds873@rediffmail.com</span>
             </li>
             <li className="flex items-center">
               <FiClock className="text-accent w-5 h-5 mr-3 flex-shrink-0" />
-              <span>Mon - Sat: 9:00 AM - 6:00 PM</span>
+              <span>Mon - Sun: 11:00 AM - 8:30 PM</span>
             </li>
           </ul>
 
@@ -147,7 +147,7 @@ const Footer = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-slate-850 pt-8 mt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500">
-        <p>&copy; {new Date().getFullYear()} DIGITECH SYSTEMS. All rights reserved. Your Trusted Technology Partner.</p>
+        <p>&copy; {new Date().getFullYear()} DigiTech Systems. All rights reserved. Your Complete Laptop Solution.</p>
         <div className="flex space-x-6 mt-4 sm:mt-0">
           <a href="#" className="hover:text-accent transition">Privacy Policy</a>
           <a href="#" className="hover:text-accent transition">Terms of Service</a>
