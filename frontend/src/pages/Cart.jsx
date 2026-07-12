@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { FiTrash2, FiMinus, FiPlus, FiArrowRight, FiShoppingBag } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { CartContext } from '../context/CartContext.jsx';
 
 const Cart = () => {
@@ -20,6 +21,17 @@ const Cart = () => {
       updateCartQty(id, nextQty);
     }
   };
+
+  const origin = window.location.origin;
+  const itemsText = cartItems.map((item, idx) => {
+    const itemPrice = item.discountPrice > 0 ? item.discountPrice : item.price;
+    const itemUrl = `${origin}/product/${item.product}`;
+    return `${idx + 1}. ${item.name}\n   - Quantity: ${item.qty}\n   - Price: ₹${itemPrice} each\n   - Link: ${itemUrl}`;
+  }).join('\n\n');
+
+  const greeting = "Hello DigiTech Systems,";
+  const messageText = `${greeting}\n\nI would like to place an order for the following items in my cart:\n\n${itemsText}\n\n*Order Summary:*\n- Items Subtotal: ₹${itemsPrice}\n- Shipping: ${shippingPrice === 0 ? 'FREE' : `₹${shippingPrice}`}\n- Sales Tax (8%): ₹${taxPrice}\n- *Total Amount:* ₹${totalPrice}\n\nPlease process my order. My details are:\n- Name:\n- Delivery Address:\n\nThank you!`;
+  const whatsappUrl = `https://wa.me/919927700201?text=${encodeURIComponent(messageText)}`;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -155,12 +167,24 @@ const Cart = () => {
               </div>
             </div>
 
-            <Link
-              to="/products"
-              className="w-full bg-accent hover:bg-secondary text-white font-bold py-3.5 rounded-xl shadow-md transition duration-300 flex items-center justify-center space-x-2 text-center text-sm"
-            >
-              <span>Continue Shopping</span>
-            </Link>
+            <div className="space-y-3">
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-xl shadow-md transition duration-300 flex items-center justify-center space-x-2 text-center text-sm"
+              >
+                <FaWhatsapp className="w-4.5 h-4.5" />
+                <span>Order Now via WhatsApp</span>
+              </a>
+
+              <Link
+                to="/products"
+                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-750 font-bold py-3.5 rounded-xl shadow-sm transition duration-300 flex items-center justify-center space-x-2 text-center text-sm text-slate-700"
+              >
+                <span>Continue Shopping</span>
+              </Link>
+            </div>
           </div>
 
         </div>
