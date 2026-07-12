@@ -121,13 +121,13 @@ const Footer = () => {
             </li>
             <li className="flex items-center">
               <FiPhone className="text-accent w-5 h-5 mr-3 flex-shrink-0" />
-              <a href="tel:+919927700201" className="hover:text-accent transition duration-200">
+              <a href="tel:+919927700201" target="_self" className="hover:text-accent transition duration-200">
                 +91 9927700201
               </a>
             </li>
             <li className="flex items-center">
               <FiMail className="text-accent w-5 h-5 mr-3 flex-shrink-0" />
-              <a href="mailto:ds873@rediffmail.com" className="hover:text-accent transition duration-200">
+              <a href="mailto:ds873@rediffmail.com" target="_self" className="hover:text-accent transition duration-200">
                 ds873@rediffmail.com
               </a>
             </li>

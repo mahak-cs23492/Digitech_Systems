@@ -92,7 +92,7 @@ const Contact = () => {
               </div>
               <a 
                 href={c.link}
-                target={c.link.startsWith('http') ? '_blank' : undefined}
+                target={c.link.startsWith('http') ? '_blank' : '_self'}
                 rel={c.link.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="text-accent hover:text-secondary font-bold text-xs flex items-center space-x-1 pt-4 text-left border-t border-slate-50 w-full block"
               >
