@@ -35,6 +35,8 @@ const runTest = async () => {
 
     // Clean up
     await User.deleteMany({ email: 'test_phone_register@gmail.com' });
+    await User.deleteMany({ email: 'tester_phone@gmail.com' });
+    await User.deleteMany({ email: 'local_tester@gmail.com' });
     process.exit(0);
   } catch (error) {
     console.error('Error during test:', error);
