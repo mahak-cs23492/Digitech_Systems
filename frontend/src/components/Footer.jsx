@@ -54,7 +54,7 @@ const Footer = () => {
             <a href="https://twitter.com" target="_blank" rel="noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-accent hover:text-white transition duration-300">
               <FiTwitter className="w-4 h-4" />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-accent hover:text-white transition duration-300">
+            <a href="https://www.instagram.com/digitech.systems?igsh=Zmc4czF2ZzdtNHcz" target="_blank" rel="noopener noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-accent hover:text-white transition duration-300">
               <FiInstagram className="w-4 h-4" />
             </a>
             <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="bg-slate-800 p-2.5 rounded-full hover:bg-accent hover:text-white transition duration-300">
