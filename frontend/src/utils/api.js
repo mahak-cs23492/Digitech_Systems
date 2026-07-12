@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '', // Falls back to proxy in development
+  baseURL: '', // Always route through relative paths for proxy rewrites
 });
 
 // Automatically inject JWT token from localStorage into requests

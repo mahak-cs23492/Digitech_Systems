@@ -38,17 +38,13 @@ const Contact = () => {
       icon: <FiPhone />,
       title: 'Telephone Support',
       desc: 'Connect directly with sales team or technicians.',
-      value: '+91 9927700201',
-      link: 'tel:+919927700201',
-      actionText: 'Call Now'
+      value: '+91 9927700201'
     },
     {
       icon: <FiMail />,
       title: 'Email Correspondence',
       desc: 'Send us business quotes or inquiries.',
-      value: 'ds873@rediffmail.com',
-      link: 'mailto:ds873@rediffmail.com',
-      actionText: 'Send Email'
+      value: 'ds873@rediffmail.com'
     },
     {
       icon: <FiMapPin />,
@@ -61,12 +57,11 @@ const Contact = () => {
   ];
 
   return (
-    <div className="bg-neutralbg pb-16">
+    <div className="bg-neutralbg min-h-screen">
       
-      {/* Header Banner */}
-      <div className="relative bg-slate-950 py-20 text-center text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1547082299-de196ea013d6?q=80&w=1200')] bg-cover bg-center opacity-20"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 to-slate-950"></div>
+      {/* Page Header */}
+      <div className="bg-primary text-white py-16 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]"></div>
         
         <div className="relative max-w-4xl mx-auto px-4 z-10 space-y-4">
           <span className="text-accent font-extrabold text-xs tracking-widest uppercase">Support Center</span>
@@ -88,16 +83,22 @@ const Contact = () => {
                 </div>
                 <h4 className="font-extrabold text-slate-900 text-base">{c.title}</h4>
                 <p className="text-slate-450 text-xs leading-relaxed">{c.desc}</p>
-                <p className="font-extrabold text-slate-800 text-sm">{c.value}</p>
+                <p className="font-extrabold text-slate-800 text-sm select-all">{c.value}</p>
               </div>
-              <a 
-                href={c.link}
-                target={c.link.startsWith('http') ? '_blank' : '_self'}
-                rel={c.link.startsWith('http') ? 'noopener noreferrer' : undefined}
-                className="text-accent hover:text-secondary font-bold text-xs flex items-center space-x-1 pt-4 text-left border-t border-slate-50 w-full block"
-              >
-                <span>{c.actionText}</span>
-              </a>
+              {c.link && c.actionText ? (
+                <a 
+                  href={c.link}
+                  target={c.link.startsWith('http') ? '_blank' : '_self'}
+                  rel={c.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  className="text-accent hover:text-secondary font-bold text-xs flex items-center space-x-1 pt-4 text-left border-t border-slate-50 w-full block"
+                >
+                  <span>{c.actionText}</span>
+                </a>
+              ) : (
+                <div className="pt-4 border-t border-slate-50 text-[11px] text-slate-400">
+                  Plain text detail for manual copy
+                </div>
+              )}
             </div>
           ))}
         </div>
