@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: '', // Always route through relative paths for proxy rewrites
+  baseURL: import.meta.env.DEV ? '' : 'https://digitech-backend-btn8.onrender.com',
 });
 
 // Automatically inject JWT token from localStorage into requests
