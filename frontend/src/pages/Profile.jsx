@@ -15,6 +15,7 @@ const Profile = () => {
   // Personal Info Form States
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -25,6 +26,7 @@ const Profile = () => {
     if (userInfo) {
       setName(userInfo.name || '');
       setEmail(userInfo.email || '');
+      setPhone(userInfo.phone || '');
     }
   }, [userInfo]);
 
@@ -36,7 +38,7 @@ const Profile = () => {
     }
 
     setFormLoading(true);
-    const result = await updateProfile({ name, email, password });
+    const result = await updateProfile({ name, email, password, phone });
     setFormLoading(false);
 
     if (result.success) {
@@ -125,6 +127,17 @@ const Profile = () => {
                       required
                     />
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Phone Number (Optional)</label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="e.g. +91 9927700201"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent"
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">

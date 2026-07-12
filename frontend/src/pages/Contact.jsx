@@ -1,67 +1,7 @@
-import React, { useState } from 'react';
-import { FiPhone, FiMail, FiMapPin, FiClock, FiSend } from 'react-icons/fi';
-import { toast } from 'react-toastify';
-import API from '../utils/api.js';
+import React from 'react';
+import { FiPhone, FiMail, FiMapPin, FiClock } from 'react-icons/fi';
 
 const Contact = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!name || !email || !message) {
-      toast.error('Please complete all required fields');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const web3FormsKey = import.meta.env.VITE_WEB3FORMS_KEY;
-
-      if (web3FormsKey) {
-        // Submit via Web3Forms free service
-        const response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          },
-          body: JSON.stringify({
-            access_key: web3FormsKey,
-            name,
-            email,
-            phone: phone || 'Not Provided',
-            subject: subject || 'New Contact Submission',
-            message: message
-          })
-        });
-        const result = await response.json();
-        if (!result.success) {
-          throw new Error(result.message || 'Web3Forms submission failed');
-        }
-      } else {
-        // Fallback: Submit directly to backend database API
-        await API.post('/api/contact', { name, email, subject, message, phone });
-      }
-
-      toast.success('Your message has been sent successfully. A DigiTech Systems consultant will contact you shortly.');
-      setName('');
-      setEmail('');
-      setPhone('');
-      setSubject('');
-      setMessage('');
-    } catch (error) {
-      console.error('Contact form submission failed:', error);
-      toast.error(error.response?.data?.message || error.message || 'Failed to send message. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const contactCards = [
     {
       icon: <FiPhone />,
@@ -88,14 +28,16 @@ const Contact = () => {
   return (
     <div className="bg-neutralbg min-h-screen">
       
-      {/* Page Header */}
-      <div className="bg-primary text-white py-16 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#3b82f6_1px,transparent_1px)] [background-size:16px_16px]"></div>
+      {/* Hero Banner Header (Center Aligned, matching About page style) */}
+      <div className="relative bg-slate-950 py-20 text-center text-white overflow-hidden">
+        {/* Background Overlay */}
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1547082299-de196ea013d6?q=80&w=1200')] bg-cover bg-center opacity-20"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/80 to-slate-950"></div>
         
         <div className="relative max-w-4xl mx-auto px-4 z-10 space-y-4">
           <span className="text-accent font-extrabold text-xs tracking-widest uppercase">Support Center</span>
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">Contact DigiTech Systems</h1>
-          <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-xl mx-auto">
+          <p className="text-slate-300 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
             Have questions about laptop specifications, custom configurations, or services? We are here to help.
           </p>
         </div>
@@ -117,8 +59,8 @@ const Contact = () => {
               {c.link && c.actionText ? (
                 <a 
                   href={c.link}
-                  target={c.link.startsWith('http') ? '_blank' : '_self'}
-                  rel={c.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-accent hover:text-secondary font-bold text-xs flex items-center space-x-1 pt-4 text-left border-t border-slate-50 w-full block"
                 >
                   <span>{c.actionText}</span>
@@ -133,81 +75,34 @@ const Contact = () => {
         </div>
       </div>
 
-      {/* Form Submission & Map layout */}
+      {/* WhatsApp Redirect (Option B) & Map layout */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 py-10">
         
-        {/* Form */}
-        <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-card space-y-6">
-          <h3 className="text-xl font-extrabold text-slate-900 border-b border-slate-50 pb-3">Send a Message</h3>
-          
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Your Name</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Jane Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Email Address</label>
-                <input
-                  type="email"
-                  placeholder="e.g. jane.doe@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Phone Number (Optional)</label>
-                <input
-                  type="tel"
-                  placeholder="e.g. +91 9927700201"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent"
-                />
+        {/* Option B: WhatsApp Chat */}
+        <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-card space-y-6 flex flex-col justify-between">
+          <div className="space-y-4">
+            <h3 className="text-xl font-extrabold text-slate-900 border-b border-slate-50 pb-3">Direct Inquiries</h3>
+            <p className="text-slate-500 text-sm leading-relaxed">
+              Have a question about laptop stock, custom configurations, repairs, or service pricing? Connect with us directly on WhatsApp for instant assistance.
+            </p>
+            <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4 flex items-start space-x-3.5 mt-2">
+              <span className="text-2xl text-emerald-600">💬</span>
+              <div className="space-y-1">
+                <h5 className="font-extrabold text-slate-800 text-xs uppercase tracking-wider">Fast Response Timings</h5>
+                <p className="text-slate-500 text-[11px] leading-relaxed">
+                  Monday – Sunday: 11:00 AM – 8:30 PM (Quick updates from our support team)
+                </p>
               </div>
             </div>
-
-            <div>
-              <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Subject (Optional)</label>
-              <input
-                type="text"
-                placeholder="e.g. Custom Workstation Configuration"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Message Content</label>
-              <textarea
-                rows="5"
-                placeholder="How can DigiTech Systems help you today? Detail specs or request services..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent"
-                required
-              ></textarea>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-accent hover:bg-secondary text-white font-bold py-3.5 px-6 rounded-xl text-xs shadow-md transition duration-300 flex items-center justify-center space-x-2"
-            >
-              <FiSend />
-              <span>{loading ? 'Submitting...' : 'Submit Message'}</span>
-            </button>
-          </form>
+          </div>
+          <a
+            href="https://wa.me/919927700201?text=Hi,%20I%20have%20an%20inquiry%20regarding%20DigiTech%20Systems"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-6 rounded-2xl shadow-md transition duration-300 transform active:scale-98 flex items-center justify-center space-x-2 text-sm hover:shadow-lg mt-6"
+          >
+            <span>Chat with us on WhatsApp</span>
+          </a>
         </div>
 
         {/* Operating Hours & Stylized Map placeholder */}
@@ -230,14 +125,11 @@ const Contact = () => {
 
           {/* Map Simulation Box */}
           <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-card flex-1 min-h-[250px] relative overflow-hidden flex flex-col justify-end">
-            {/* Styled Map Background Grid representation */}
             <div className="absolute inset-0 bg-slate-50 bg-[radial-gradient(#CBD5E1_1px,transparent_1px)] [background-size:16px_16px] opacity-60"></div>
             
-            {/* Styled Road Mock lines */}
             <div className="absolute top-1/3 left-0 right-0 h-4 bg-slate-200 rotate-1"></div>
             <div className="absolute left-1/3 top-0 bottom-0 w-4 bg-slate-200 -rotate-2"></div>
             
-            {/* Pin mock mark */}
             <div className="absolute top-1/3 left-1/3 -mt-6 -ml-4 z-10 flex flex-col items-center">
               <div className="bg-accent text-white p-2 rounded-full shadow-lg border border-white animate-bounce">
                 <FiMapPin className="w-5 h-5" />
