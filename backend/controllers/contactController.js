@@ -4,7 +4,7 @@ import Contact from '../models/Contact.js';
 // @route   POST /api/contact
 // @access  Public
 export const submitContactForm = async (req, res, next) => {
-  const { name, email, subject, message } = req.body;
+  const { name, email, subject, message, phone } = req.body;
 
   if (!name || !email || !message) {
     res.status(400);
@@ -17,6 +17,7 @@ export const submitContactForm = async (req, res, next) => {
       email,
       subject,
       message,
+      phone: phone || '',
     });
 
     res.status(201).json({

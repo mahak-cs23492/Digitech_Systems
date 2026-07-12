@@ -18,6 +18,7 @@ const authUser = async (req, res, next) => {
         name: user.name,
         email: user.email,
         isAdmin: user.isAdmin,
+        phone: user.phone || '',
         shippingAddress: user.shippingAddress,
         token: generateToken(user._id),
       });
@@ -35,7 +36,7 @@ const authUser = async (req, res, next) => {
 // @access  Public
 const registerUser = async (req, res, next) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
 
     const userExists = await User.findOne({ email });
 
@@ -48,6 +49,7 @@ const registerUser = async (req, res, next) => {
       name,
       email,
       password,
+      phone: phone || '',
     });
 
     if (user) {
@@ -56,6 +58,7 @@ const registerUser = async (req, res, next) => {
         name: user.name,
         email: user.email,
         isAdmin: user.isAdmin,
+        phone: user.phone || '',
         shippingAddress: user.shippingAddress,
         token: generateToken(user._id),
       });
@@ -81,6 +84,7 @@ const getUserProfile = async (req, res, next) => {
         name: user.name,
         email: user.email,
         isAdmin: user.isAdmin,
+        phone: user.phone || '',
         shippingAddress: user.shippingAddress,
       });
     } else {
@@ -102,6 +106,7 @@ const updateUserProfile = async (req, res, next) => {
     if (user) {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
+      user.phone = req.body.phone !== undefined ? req.body.phone : user.phone;
       if (req.body.password) {
         user.password = req.body.password;
       }
@@ -121,6 +126,7 @@ const updateUserProfile = async (req, res, next) => {
         name: updatedUser.name,
         email: updatedUser.email,
         isAdmin: updatedUser.isAdmin,
+        phone: updatedUser.phone || '',
         shippingAddress: updatedUser.shippingAddress,
         token: generateToken(updatedUser._id),
       });

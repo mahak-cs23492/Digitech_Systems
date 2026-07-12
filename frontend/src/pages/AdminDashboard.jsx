@@ -476,7 +476,12 @@ const AdminDashboard = () => {
                       <div className="flex justify-between items-start flex-wrap gap-2 mb-2">
                         <div>
                           <h4 className="font-extrabold text-sm text-slate-900">{msg.name}</h4>
-                          <a href={`mailto:${msg.email}`} className="text-xs text-accent hover:underline font-semibold block">{msg.email}</a>
+                          <div className="flex flex-wrap items-center gap-2 text-xs">
+                            <a href={`mailto:${msg.email}`} className="text-accent hover:underline font-semibold">{msg.email}</a>
+                            {msg.phone && (
+                              <span className="text-slate-400 font-semibold">| Phone: {msg.phone}</span>
+                            )}
+                          </div>
                         </div>
                         <span className="text-[10px] text-slate-400 font-semibold">
                           {new Date(msg.createdAt).toLocaleDateString()} at {new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}

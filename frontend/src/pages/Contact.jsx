@@ -6,6 +6,7 @@ import API from '../utils/api.js';
 const Contact = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,15 +20,43 @@ const Contact = () => {
 
     setLoading(true);
     try {
-      await API.post('/api/contact', { name, email, subject, message });
+      const web3FormsKey = import.meta.env.VITE_WEB3FORMS_KEY;
+
+      if (web3FormsKey) {
+        // Submit via Web3Forms free service
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({
+            access_key: web3FormsKey,
+            name,
+            email,
+            phone: phone || 'Not Provided',
+            subject: subject || 'New Contact Submission',
+            message: message
+          })
+        });
+        const result = await response.json();
+        if (!result.success) {
+          throw new Error(result.message || 'Web3Forms submission failed');
+        }
+      } else {
+        // Fallback: Submit directly to backend database API
+        await API.post('/api/contact', { name, email, subject, message, phone });
+      }
+
       toast.success('Your message has been sent successfully. A DigiTech Systems consultant will contact you shortly.');
       setName('');
       setEmail('');
+      setPhone('');
       setSubject('');
       setMessage('');
     } catch (error) {
       console.error('Contact form submission failed:', error);
-      toast.error(error.response?.data?.message || 'Failed to send message. Please try again.');
+      toast.error(error.response?.data?.message || error.message || 'Failed to send message. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -112,7 +141,7 @@ const Contact = () => {
           <h3 className="text-xl font-extrabold text-slate-900 border-b border-slate-50 pb-3">Send a Message</h3>
           
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Your Name</label>
                 <input
@@ -133,6 +162,16 @@ const Contact = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent"
                   required
+                />
+              </div>
+              <div>
+                <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Phone Number (Optional)</label>
+                <input
+                  type="tel"
+                  placeholder="e.g. +91 9927700201"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent"
                 />
               </div>
             </div>

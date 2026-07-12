@@ -11,6 +11,7 @@ const Register = () => {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -33,7 +34,7 @@ const Register = () => {
       return;
     }
 
-    const result = await register(name, email, password);
+    const result = await register(name, email, password, phone);
     if (result.success) {
       toast.success('Registration successful! Welcome!');
     } else {
@@ -75,6 +76,17 @@ const Register = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent"
               required
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider mb-2">Phone Number (Optional)</label>
+            <input
+              type="tel"
+              placeholder="e.g. +91 9927700201"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-accent"
             />
           </div>
 
