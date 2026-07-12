@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FiHeart, FiShoppingCart, FiCheckCircle, FiMinus, FiPlus, FiStar, FiFileText } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { AuthContext } from '../context/AuthContext.jsx';
 import { CartContext } from '../context/CartContext.jsx';
 import API from '../utils/api.js';
@@ -121,6 +122,11 @@ const ProductDetails = () => {
        ? Array.from(product.specifications.entries()) 
        : Object.entries(product.specifications))
     : [];
+
+  const productPrice = product.discountPrice > 0 ? product.discountPrice : product.price;
+  const productUrl = window.location.href;
+  const messageText = `Hello DigiTech Systems,\n\nI would like to order the following product:\n- Product: ${product.name}\n- Price: ₹${productPrice}\n- Link: ${productUrl}\n\nPlease share availability. My details are:\n- Name:\n- Delivery Address:\n\nThank you!`;
+  const whatsappUrl = `https://wa.me/919927700201?text=${encodeURIComponent(messageText)}`;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -278,6 +284,17 @@ const ProductDetails = () => {
                 <FiShoppingCart className="w-5 h-5" />
                 <span>Add to Cart</span>
               </button>
+
+              {/* Order Now */}
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-md transition duration-300 flex items-center justify-center space-x-2 text-center"
+              >
+                <FaWhatsapp className="w-5 h-5" />
+                <span>Order Now</span>
+              </a>
 
               {/* Wishlist Icon */}
               <button
