@@ -27,7 +27,6 @@ const AdminDashboard = () => {
   // State collections
   const [products, setProducts] = useState([]);
   const [users, setUsers] = useState([]);
-  const [messages, setMessages] = useState([]);
   
   // Loading indicators
   const [loading, setLoading] = useState(true);
@@ -83,9 +82,6 @@ const AdminDashboard = () => {
         } else if (activeTab === 'users') {
           const { data } = await API.get('/api/users');
           setUsers(data);
-        } else if (activeTab === 'messages') {
-          const { data } = await API.get('/api/contact');
-          setMessages(data);
         }
       } catch (error) {
         console.error('Error fetching admin data:', error);
@@ -276,8 +272,7 @@ const AdminDashboard = () => {
 
   const tabs = [
     { id: 'products', label: 'Products Inventory', icon: <FiBox /> },
-    { id: 'users', label: 'System Users', icon: <FiUsers /> },
-    { id: 'messages', label: 'Customer Messages', icon: <FiMail /> }
+    { id: 'users', label: 'System Users', icon: <FiUsers /> }
   ];
 
   return (
@@ -462,45 +457,7 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {/* TAB 5: CUSTOMER MESSAGES */}
-          {activeTab === 'messages' && (
-            <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-card space-y-6">
-              <h3 className="text-lg font-extrabold text-slate-900 border-b border-slate-50 pb-3">Received Messages</h3>
-              
-              {messages.length === 0 ? (
-                <div className="py-12 text-center text-slate-500 border border-dashed rounded-2xl">
-                  No contact messages received yet.
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {messages.map((msg) => (
-                    <div key={msg._id} className="border border-slate-100 rounded-2xl p-5 hover:bg-slate-50/40 transition">
-                      <div className="flex justify-between items-start flex-wrap gap-2 mb-2">
-                        <div>
-                          <h4 className="font-extrabold text-sm text-slate-900">{msg.name}</h4>
-                          <div className="flex flex-wrap items-center gap-2 text-xs">
-                            <a href={`mailto:${msg.email}`} className="text-accent hover:underline font-semibold">{msg.email}</a>
-                            {msg.phone && (
-                              <span className="text-slate-400 font-semibold">| Phone: {msg.phone}</span>
-                            )}
-                          </div>
-                        </div>
-                        <span className="text-[10px] text-slate-400 font-semibold">
-                          {new Date(msg.createdAt).toLocaleDateString()} at {new Date(msg.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                        </span>
-                      </div>
-                      {msg.subject && (
-                        <p className="text-xs font-bold text-slate-700 mb-1">Subject: {msg.subject}</p>
-                      )}
-                      <p className="text-xs text-slate-655 text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg mt-2 whitespace-pre-wrap">
-                        {msg.message}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+
 
         </>
       )}
