@@ -110,15 +110,26 @@ const Footer = () => {
           <ul className="space-y-3.5 text-sm text-slate-400 mb-6">
             <li className="flex items-start">
               <FiMapPin className="text-accent w-5 h-5 mr-3 mt-0.5 flex-shrink-0" />
-              <span>Shop No. 1, Marris Tower, Marris Road, In Front of Citi Centre Mall, Aligarh</span>
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=Shop+No.+1,+Marris+Tower,+Marris+Road,+Aligarh" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-accent transition duration-200"
+              >
+                Shop No. 1, Marris Tower, Marris Road, In Front of Citi Centre Mall, Aligarh
+              </a>
             </li>
             <li className="flex items-center">
               <FiPhone className="text-accent w-5 h-5 mr-3 flex-shrink-0" />
-              <span>+91 9927700201</span>
+              <a href="tel:+919927700201" className="hover:text-accent transition duration-200">
+                +91 9927700201
+              </a>
             </li>
             <li className="flex items-center">
               <FiMail className="text-accent w-5 h-5 mr-3 flex-shrink-0" />
-              <span>ds873@rediffmail.com</span>
+              <a href="mailto:ds873@rediffmail.com" className="hover:text-accent transition duration-200">
+                ds873@rediffmail.com
+              </a>
             </li>
             <li className="flex items-center">
               <FiClock className="text-accent w-5 h-5 mr-3 flex-shrink-0" />

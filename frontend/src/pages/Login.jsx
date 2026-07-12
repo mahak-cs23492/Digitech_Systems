@@ -91,11 +91,6 @@ const Login = () => {
               Create an account
             </Link>
           </p>
-          <div className="bg-slate-50 border rounded-xl p-3 text-left space-y-1 mt-4 text-[10px] text-slate-400 leading-normal">
-            <p className="font-bold text-slate-600">Sample Credentials for testing:</p>
-            <p>🔑 <span className="font-bold">Admin:</span> admin@digitech.com / admin123</p>
-            <p>🔑 <span className="font-bold">Customer:</span> customer@digitech.com / customer123</p>
-          </div>
         </div>
 
       </div>

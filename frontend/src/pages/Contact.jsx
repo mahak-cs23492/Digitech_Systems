@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiPhone, FiMail, FiMapPin, FiClock, FiSend } from 'react-icons/fi';
 import { toast } from 'react-toastify';
+import API from '../utils/api.js';
 
 const Contact = () => {
   const [name, setName] = useState('');
@@ -9,7 +10,7 @@ const Contact = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !email || !message) {
       toast.error('Please complete all required fields');
@@ -17,15 +18,19 @@ const Contact = () => {
     }
 
     setLoading(true);
-    // Simulating API latency
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await API.post('/api/contact', { name, email, subject, message });
       toast.success('Your message has been sent successfully. A DigiTech Systems consultant will contact you shortly.');
       setName('');
       setEmail('');
       setSubject('');
       setMessage('');
-    }, 1200);
+    } catch (error) {
+      console.error('Contact form submission failed:', error);
+      toast.error(error.response?.data?.message || 'Failed to send message. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const contactCards = [
@@ -34,6 +39,7 @@ const Contact = () => {
       title: 'Telephone Support',
       desc: 'Connect directly with sales team or technicians.',
       value: '+91 9927700201',
+      link: 'tel:+919927700201',
       actionText: 'Call Now'
     },
     {
@@ -41,6 +47,7 @@ const Contact = () => {
       title: 'Email Correspondence',
       desc: 'Send us business quotes or inquiries.',
       value: 'ds873@rediffmail.com',
+      link: 'mailto:ds873@rediffmail.com',
       actionText: 'Send Email'
     },
     {
@@ -48,6 +55,7 @@ const Contact = () => {
       title: 'Retail Shop Address',
       desc: 'Visit our flagship computer hardware hub.',
       value: 'Shop No. 1, Marris Tower, Marris Road, Aligarh',
+      link: 'https://www.google.com/maps/search/?api=1&query=Shop+No.+1,+Marris+Tower,+Marris+Road,+Aligarh',
       actionText: 'Get Directions'
     }
   ];
@@ -82,9 +90,14 @@ const Contact = () => {
                 <p className="text-slate-450 text-xs leading-relaxed">{c.desc}</p>
                 <p className="font-extrabold text-slate-800 text-sm">{c.value}</p>
               </div>
-              <button className="text-accent hover:text-secondary font-bold text-xs flex items-center space-x-1 pt-4 text-left border-t border-slate-50">
+              <a 
+                href={c.link}
+                target={c.link.startsWith('http') ? '_blank' : undefined}
+                rel={c.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                className="text-accent hover:text-secondary font-bold text-xs flex items-center space-x-1 pt-4 text-left border-t border-slate-50 w-full block"
+              >
                 <span>{c.actionText}</span>
-              </button>
+              </a>
             </div>
           ))}
         </div>
@@ -197,7 +210,14 @@ const Contact = () => {
             <div className="bg-white/95 backdrop-blur-md border border-slate-100 p-4 rounded-2xl relative z-10 shadow-lg text-xs max-w-sm m-4 self-start">
               <p className="font-bold text-slate-900 mb-1">DigiTech Store</p>
               <p className="text-slate-500 mb-2 leading-relaxed">Shop No. 1, Marris Tower, Marris Road, In Front of Citi Centre Mall, Aligarh</p>
-              <a href="#" className="text-accent hover:underline font-bold">Open in Maps</a>
+              <a 
+                href="https://www.google.com/maps/search/?api=1&query=Shop+No.+1,+Marris+Tower,+Marris+Road,+Aligarh" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-accent hover:underline font-bold"
+              >
+                Open in Maps
+              </a>
             </div>
           </div>
 
