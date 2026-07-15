@@ -13,7 +13,33 @@ import {
   downloadSampleExcel,
 } from '../controllers/bulkImportController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
-import upload from '../middleware/uploadMiddleware.js';
+import multer from 'multer';
+import path from 'path';
+
+// Dedicated Multer instance for Bulk Import to support .csv, .xlsx, .zip and image formats
+const bulkUpload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, cb) {
+      cb(null, 'uploads/');
+    },
+    filename(req, file, cb) {
+      cb(
+        null,
+        `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
+      );
+    },
+  }),
+  fileFilter(req, file, cb) {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const allowed = ['.csv', '.xlsx', '.xls', '.zip', '.jpg', '.jpeg', '.png', '.webp'];
+    if (allowed.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error(`File format ${ext} is not supported. Please upload CSV, Excel, ZIP or image files only.`));
+    }
+  },
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+});
 
 const router = express.Router();
 
@@ -26,7 +52,7 @@ router.post(
   '/bulk-import',
   protect,
   admin,
-  upload.fields([
+  bulkUpload.fields([
     { name: 'file', maxCount: 1 },
     { name: 'zip', maxCount: 1 },
     { name: 'images', maxCount: 500 },
