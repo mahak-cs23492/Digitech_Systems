@@ -15,7 +15,14 @@ import {
   FiUploadCloud, 
   FiCheckCircle, 
   FiList,
-  FiMail 
+  FiMail,
+  FiDownload,
+  FiFileText,
+  FiAlertTriangle,
+  FiFolder,
+  FiArchive,
+  FiSettings,
+  FiRefreshCw
 } from 'react-icons/fi';
 
 const AdminDashboard = () => {
@@ -50,6 +57,21 @@ const AdminDashboard = () => {
   const [prodBestSeller, setProdBestSeller] = useState(false);
   const [prodNewArrival, setProdNewArrival] = useState(false);
   const [prodIsHidden, setProdIsHidden] = useState(false);
+  
+  // Bulk Import state declarations
+  const [importFile, setImportFile] = useState(null);
+  const [importZip, setImportZip] = useState(null);
+  const [importFolderFiles, setImportFolderFiles] = useState([]);
+  const [importMode, setImportMode] = useState('create_only'); // 'create_only' or 'update_existing'
+  const [imageMode, setImageMode] = useState('replace'); // 'replace' or 'append'
+  const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
+  const [importPhase, setImportPhase] = useState('');
+  const [importPhaseDetails, setImportPhaseDetails] = useState('');
+  const [importSummary, setImportSummary] = useState(null);
+  const [importErrors, setImportErrors] = useState([]);
+  const [importSuccess, setImportSuccess] = useState(false);
+  const [imageUploadType, setImageUploadType] = useState('zip'); // 'zip' or 'folder'
 
   // Categories & Brands collections
   const categoriesList = ['Laptops', 'Printers', 'Monitors', 'Accessories'];
@@ -270,8 +292,145 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleDownloadSample = async (type) => {
+    try {
+      const baseUrl = import.meta.env.DEV ? '' : 'https://digitech-backend-btn8.onrender.com';
+      const token = userInfo?.token;
+      const response = await fetch(`${baseUrl}/api/products/sample/${type}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) throw new Error('Download failed');
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `sample-products.${type}`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error('Failed to download template:', error);
+      toast.error('Failed to download template file');
+    }
+  };
+
+  const handleImportSubmit = async (e) => {
+    e.preventDefault();
+    if (!importFile) {
+      toast.error('Please upload an Excel or CSV file.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', importFile);
+    
+    if (imageUploadType === 'zip') {
+      if (importZip) {
+        formData.append('zip', importZip);
+      }
+    } else {
+      if (importFolderFiles && importFolderFiles.length > 0) {
+        for (let i = 0; i < importFolderFiles.length; i++) {
+          formData.append('images', importFolderFiles[i]);
+        }
+      }
+    }
+
+    formData.append('importMode', importMode);
+    formData.append('imageMode', imageMode);
+
+    setImporting(true);
+    setImportProgress(0);
+    setImportPhase('Reading Excel');
+    setImportPhaseDetails('Preparing connection...');
+    setImportSummary(null);
+    setImportErrors([]);
+    setImportSuccess(false);
+
+    try {
+      const baseUrl = import.meta.env.DEV ? '' : 'https://digitech-backend-btn8.onrender.com';
+      const token = userInfo?.token;
+      const response = await fetch(`${baseUrl}/api/products/bulk-import`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Server error occurred');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          try {
+            const data = JSON.parse(line);
+            
+            if (data.status === 'reading_excel') {
+              setImportPhase('Reading Excel');
+              setImportProgress(15);
+              setImportPhaseDetails(data.message || '');
+            } else if (data.status === 'uploading_images') {
+              setImportPhase('Uploading Images');
+              const pct = Math.round((data.current / (data.total || 1)) * 60) + 15;
+              setImportProgress(pct);
+              setImportPhaseDetails(data.message || `Uploading image ${data.current}/${data.total}...`);
+            } else if (data.status === 'creating_products') {
+              setImportPhase('Creating Products');
+              setImportProgress(85);
+              setImportPhaseDetails(data.message || '');
+            } else if (data.status === 'completed') {
+              setImportProgress(100);
+              setImportPhase('Completed');
+              setImportPhaseDetails('');
+              
+              if (data.success) {
+                setImportSuccess(true);
+                setImportSummary(data.summary);
+                setImportErrors(data.errors || []);
+                toast.success('Bulk import completed!');
+                
+                // Reset file selections on success
+                setImportFile(null);
+                setImportZip(null);
+                setImportFolderFiles([]);
+              } else {
+                toast.error(data.error || 'Import failed');
+              }
+            }
+          } catch (err) {
+            console.error('Error parsing progress stream line:', err);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Import connection failed:', err);
+      toast.error(err.message || 'Network error connecting to backend.');
+    } finally {
+      setImporting(false);
+    }
+  };
+
   const tabs = [
     { id: 'products', label: 'Products Inventory', icon: <FiBox /> },
+    { id: 'bulk-import', label: 'Bulk Import Products', icon: <FiUploadCloud /> },
     { id: 'users', label: 'System Users', icon: <FiUsers /> }
   ];
 
@@ -409,6 +568,428 @@ const AdminDashboard = () => {
                   </tbody>
                 </table>
               </div>
+
+            </div>
+          )}
+
+          {/* TAB 3: BULK IMPORT PRODUCTS */}
+          {activeTab === 'bulk-import' && (
+            <div className="space-y-8">
+              
+              {/* Style animations */}
+              <style>{`
+                @keyframes barProgress {
+                  from { background-position: 0 0; }
+                  to { background-position: 1rem 0; }
+                }
+                .animate-barProgress {
+                  background-size: 1rem 1rem;
+                  animation: barProgress 1s linear infinite;
+                }
+              `}</style>
+
+              {/* Info & Sample Download Header */}
+              <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-card flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div className="space-y-1">
+                  <h3 className="text-lg font-extrabold text-slate-900 flex items-center">
+                    <FiUploadCloud className="mr-2 text-accent" /> Bulk Import Products
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Upload an Excel or CSV sheet with product details and a matching ZIP archive or image folder.
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadSample('csv')}
+                    className="bg-slate-50 hover:bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 border border-slate-200 transition"
+                  >
+                    <FiDownload />
+                    <span>Download Sample CSV</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDownloadSample('excel')}
+                    className="bg-slate-50 hover:bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 border border-slate-200 transition"
+                  >
+                    <FiDownload />
+                    <span>Download Sample Excel</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Import Options & File Upload Grid */}
+              <form onSubmit={handleImportSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                {/* 1. Import Settings */}
+                <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-card space-y-6 lg:col-span-1">
+                  <h4 className="text-sm font-extrabold text-slate-900 flex items-center border-b border-slate-50 pb-3">
+                    <FiSettings className="mr-2 text-accent" /> Import Settings
+                  </h4>
+
+                  {/* Import Mode */}
+                  <div className="space-y-2">
+                    <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider">
+                      Import Strategy
+                    </label>
+                    <div className="grid grid-cols-1 gap-2">
+                      <label className={`flex items-start p-3 rounded-xl border cursor-pointer transition ${
+                        importMode === 'create_only' 
+                          ? 'border-accent bg-accent/5' 
+                          : 'border-slate-200 hover:bg-slate-50'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="importMode"
+                          value="create_only"
+                          checked={importMode === 'create_only'}
+                          onChange={() => setImportMode('create_only')}
+                          className="mt-1 mr-3 text-accent focus:ring-accent"
+                        />
+                        <div>
+                          <span className="block text-xs font-bold text-slate-900">Create New Only</span>
+                          <span className="block text-[10px] text-slate-400 mt-0.5">Skip rows that already exist in database</span>
+                        </div>
+                      </label>
+
+                      <label className={`flex items-start p-3 rounded-xl border cursor-pointer transition ${
+                        importMode === 'update_existing' 
+                          ? 'border-accent bg-accent/5' 
+                          : 'border-slate-200 hover:bg-slate-50'
+                      }`}>
+                        <input
+                          type="radio"
+                          name="importMode"
+                          value="update_existing"
+                          checked={importMode === 'update_existing'}
+                          onChange={() => setImportMode('update_existing')}
+                          className="mt-1 mr-3 text-accent focus:ring-accent"
+                        />
+                        <div>
+                          <span className="block text-xs font-bold text-slate-900">Update Existing Products</span>
+                          <span className="block text-[10px] text-slate-450 mt-0.5">Overwrite details of products with matching names/brands</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Image Options (only relevant if updating existing) */}
+                  {importMode === 'update_existing' && (
+                    <div className="space-y-2 border-t border-slate-50 pt-4 animate-fadeIn">
+                      <label className="block text-slate-700 text-xs font-bold uppercase tracking-wider">
+                        Image Update Strategy
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <label className={`flex items-center justify-center p-2.5 rounded-xl border text-xs font-bold cursor-pointer transition ${
+                          imageMode === 'replace' 
+                            ? 'border-accent bg-accent/5 text-accent font-extrabold' 
+                            : 'border-slate-200 text-slate-650 hover:bg-slate-50'
+                        }`}>
+                          <input
+                            type="radio"
+                            name="imageMode"
+                            value="replace"
+                            checked={imageMode === 'replace'}
+                            onChange={() => setImageMode('replace')}
+                            className="sr-only"
+                          />
+                          <span>Replace Gallery</span>
+                        </label>
+                        <label className={`flex items-center justify-center p-2.5 rounded-xl border text-xs font-bold cursor-pointer transition ${
+                          imageMode === 'append' 
+                            ? 'border-accent bg-accent/5 text-accent font-extrabold' 
+                            : 'border-slate-200 text-slate-655 hover:bg-slate-50'
+                        }`}>
+                          <input
+                            type="radio"
+                            name="imageMode"
+                            value="append"
+                            checked={imageMode === 'append'}
+                            onChange={() => setImageMode('append')}
+                            className="sr-only"
+                          />
+                          <span>Append Gallery</span>
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. File Upload Cards */}
+                <div className="lg:col-span-2 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    {/* Excel/CSV Card */}
+                    <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-card space-y-4 flex flex-col justify-between">
+                      <div>
+                        <h4 className="text-sm font-extrabold text-slate-900 flex items-center border-b border-slate-50 pb-3">
+                          <FiFileText className="mr-2 text-accent" /> Product Information File
+                        </h4>
+                        <p className="text-[11px] text-slate-450 mt-2">
+                          Select a single spreadsheet (.xlsx or .csv) file matching the template columns structure.
+                        </p>
+                      </div>
+
+                      <div className="mt-4 flex-1 flex flex-col justify-center">
+                        <label className="border-2 border-dashed border-slate-200 hover:border-accent p-6 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition text-center min-h-[160px] bg-slate-50/50 hover:bg-slate-50">
+                          <FiUploadCloud className="text-slate-450 w-8 h-8 mb-2" />
+                          {importFile ? (
+                            <div className="space-y-1">
+                              <span className="block text-xs font-bold text-slate-800 truncate max-w-[200px]">
+                                {importFile.name}
+                              </span>
+                              <span className="block text-[9px] text-slate-450">
+                                {Math.round(importFile.size / 1024)} KB
+                              </span>
+                            </div>
+                          ) : (
+                            <div>
+                              <span className="block text-xs font-bold text-slate-700">Choose CSV or Excel</span>
+                              <span className="block text-[9px] text-slate-450 mt-1">.csv, .xlsx formats</span>
+                            </div>
+                          )}
+                          <input
+                            type="file"
+                            accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                            onChange={(e) => setImportFile(e.target.files[0])}
+                            className="sr-only"
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Image uploads (ZIP or Folder Card) */}
+                    <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-card space-y-4 flex flex-col justify-between">
+                      <div>
+                        <div className="flex justify-between items-center border-b border-slate-50 pb-2">
+                          <h4 className="text-sm font-extrabold text-slate-900 flex items-center">
+                            {imageUploadType === 'zip' ? <FiArchive className="mr-2 text-accent" /> : <FiFolder className="mr-2 text-accent" />}
+                            <span>Product Images</span>
+                          </h4>
+                          
+                          {/* Sub-tab chooser */}
+                          <div className="flex bg-slate-100 p-0.5 rounded-lg text-[9px] font-bold">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setImageUploadType('zip');
+                                setImportFolderFiles([]);
+                              }}
+                              className={`px-2.5 py-1 rounded-md transition ${imageUploadType === 'zip' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-550'}`}
+                            >
+                              ZIP File
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setImageUploadType('folder');
+                                setImportZip(null);
+                              }}
+                              className={`px-2.5 py-1 rounded-md transition ${imageUploadType === 'folder' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-550'}`}
+                            >
+                              Folder
+                            </button>
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-slate-450 mt-2">
+                          {imageUploadType === 'zip' 
+                            ? 'Upload a single compressed ZIP archive containing all product images.'
+                            : 'Select the local image folder containing all product images.'}
+                        </p>
+                      </div>
+
+                      <div className="mt-4 flex-1 flex flex-col justify-center">
+                        {imageUploadType === 'zip' ? (
+                          <label className="border-2 border-dashed border-slate-200 hover:border-accent p-6 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition text-center min-h-[160px] bg-slate-50/50 hover:bg-slate-50">
+                            <FiArchive className="text-slate-450 w-8 h-8 mb-2" />
+                            {importZip ? (
+                              <div className="space-y-1">
+                                <span className="block text-xs font-bold text-slate-800 truncate max-w-[200px]">
+                                  {importZip.name}
+                                </span>
+                                <span className="block text-[9px] text-slate-450">
+                                  {Math.round(importZip.size / (1024 * 1024))} MB
+                                </span>
+                              </div>
+                            ) : (
+                              <div>
+                                <span className="block text-xs font-bold text-slate-700">Choose ZIP File</span>
+                                <span className="block text-[9px] text-slate-450 mt-1">.zip archives</span>
+                              </div>
+                            )}
+                            <input
+                              type="file"
+                              accept=".zip,application/zip,application/x-zip-compressed"
+                              onChange={(e) => setImportZip(e.target.files[0])}
+                              className="sr-only"
+                            />
+                          </label>
+                        ) : (
+                          <label className="border-2 border-dashed border-slate-200 hover:border-accent p-6 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition text-center min-h-[160px] bg-slate-50/50 hover:bg-slate-50">
+                            <FiFolder className="text-slate-450 w-8 h-8 mb-2" />
+                            {importFolderFiles.length > 0 ? (
+                              <div className="space-y-1">
+                                <span className="block text-xs font-bold text-slate-800">
+                                  {importFolderFiles.length} images selected
+                                </span>
+                                <span className="block text-[9px] text-slate-450">
+                                  Ready to upload
+                                </span>
+                              </div>
+                            ) : (
+                              <div>
+                                <span className="block text-xs font-bold text-slate-700">Choose Images Folder</span>
+                                <span className="block text-[9px] text-slate-450 mt-1">Click to select folder directory</span>
+                              </div>
+                            )}
+                            <input
+                              type="file"
+                              webkitdirectory=""
+                              directory=""
+                              multiple
+                              onChange={(e) => setImportFolderFiles(Array.from(e.target.files))}
+                              className="sr-only"
+                            />
+                          </label>
+                        )}
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Submission Action */}
+                  <div className="flex justify-end pt-4 border-t border-slate-50">
+                    <button
+                      type="submit"
+                      disabled={importing || !importFile}
+                      className="bg-accent hover:bg-secondary disabled:bg-slate-350 text-white px-8 py-3.5 rounded-2xl text-xs font-extrabold flex items-center justify-center space-x-2 transition shadow-md w-full md:w-max focus:outline-none"
+                    >
+                      {importing ? (
+                        <>
+                          <FiRefreshCw className="animate-spin text-sm" />
+                          <span>Importing Catalog Data...</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiUploadCloud className="text-sm" />
+                          <span>Start Import Job</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+              </form>
+
+              {/* Progress Indicator Card */}
+              {(importing || importPhase) && (
+                <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-card space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center">
+                      <FiRefreshCw className={`mr-2 ${importing ? 'animate-spin' : ''}`} />
+                      <span>{importPhase}</span>
+                    </span>
+                    <span className="text-sm font-extrabold text-slate-900">{importProgress}%</span>
+                  </div>
+
+                  {/* Progress bar container */}
+                  <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner border border-slate-50">
+                    <div
+                      className="bg-accent h-full transition-all duration-300 ease-out rounded-full shadow-inner relative"
+                      style={{ width: `${importProgress}%` }}
+                    >
+                      <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.15)_50%,rgba(255,255,255,0.15)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] animate-barProgress"></div>
+                    </div>
+                  </div>
+
+                  {/* Details subtext */}
+                  {importPhaseDetails && (
+                    <p className="text-[11px] font-semibold text-slate-500 italic animate-pulse">
+                      {importPhaseDetails}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Import Summary Results */}
+              {importSuccess && importSummary && (
+                <div className="space-y-6">
+                  
+                  {/* Summary title */}
+                  <h4 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider border-b border-slate-50 pb-2">
+                    Import Job Report
+                  </h4>
+
+                  {/* Grid layout */}
+                  <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+                    
+                    <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm flex flex-col justify-between">
+                      <span className="text-[10px] text-slate-400 uppercase font-bold">Total Rows</span>
+                      <span className="text-xl font-extrabold text-slate-800 mt-2">{importSummary.total}</span>
+                    </div>
+
+                    <div className="bg-green-50/20 rounded-2xl border border-green-100 p-4 shadow-sm flex flex-col justify-between">
+                      <span className="text-[10px] text-green-600/80 uppercase font-bold">Successful</span>
+                      <span className="text-xl font-extrabold text-green-600 mt-2">{importSummary.success}</span>
+                    </div>
+
+                    <div className="bg-red-50/20 rounded-2xl border border-red-100 p-4 shadow-sm flex flex-col justify-between">
+                      <span className="text-[10px] text-red-500 uppercase font-bold">Failed</span>
+                      <span className="text-xl font-extrabold text-red-500 mt-2">{importSummary.failed}</span>
+                    </div>
+
+                    <div className="bg-yellow-50/20 rounded-2xl border border-yellow-100 p-4 shadow-sm flex flex-col justify-between">
+                      <span className="text-[10px] text-yellow-600 uppercase font-bold">Missing Images</span>
+                      <span className="text-xl font-extrabold text-yellow-600 mt-2">{importSummary.missingImages}</span>
+                    </div>
+
+                    <div className="bg-slate-50 rounded-2xl border border-slate-100 p-4 shadow-sm flex flex-col justify-between">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold">Duplicates</span>
+                      <span className="text-xl font-extrabold text-slate-500 mt-2">{importSummary.duplicates}</span>
+                    </div>
+
+                    <div className="bg-blue-50/20 rounded-2xl border border-blue-100 p-4 shadow-sm flex flex-col justify-between">
+                      <span className="text-[10px] text-blue-600 uppercase font-bold">Updated</span>
+                      <span className="text-xl font-extrabold text-blue-600 mt-2">{importSummary.updated}</span>
+                    </div>
+
+                  </div>
+
+                </div>
+              )}
+
+              {/* Error and Warnings Logs */}
+              {importErrors.length > 0 && (
+                <div className="bg-white rounded-3xl border border-slate-100 p-6 md:p-8 shadow-card space-y-4">
+                  <div className="flex items-center space-x-2 border-b border-slate-50 pb-3">
+                    <FiAlertTriangle className="text-red-500 text-lg" />
+                    <h4 className="text-sm font-extrabold text-slate-900">
+                      Import Error Log ({importErrors.length} notices)
+                    </h4>
+                  </div>
+
+                  <div className="overflow-x-auto max-h-[400px]">
+                    <table className="min-w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-slate-100 text-left text-slate-450 uppercase font-bold">
+                          <th className="py-2.5 px-4 w-20">Row</th>
+                          <th className="py-2.5 px-4 w-1/3">Product Name</th>
+                          <th className="py-2.5 px-4 text-red-500">Error Description</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {importErrors.map((err, idx) => (
+                          <tr key={idx} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50">
+                            <td className="py-2.5 px-4 font-mono font-bold text-slate-500">#{err.row}</td>
+                            <td className="py-2.5 px-4 font-bold text-slate-800 truncate max-w-[200px]">{err.name || 'N/A'}</td>
+                            <td className="py-2.5 px-4 text-slate-600 font-semibold">{err.error}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
 
             </div>
           )}
